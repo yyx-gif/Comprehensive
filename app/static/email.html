@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MailFriend - AI 邮件助手</title>
+    <link rel="stylesheet" href="/style.css?v=20260823">
+    <script src="/marked.min.js"></script>
+    <style>
+        /* ========== 莫兰迪色系主题变量（内联，确保覆盖缓存的旧 style.css） ========== */
+        :root {
+            --primary: #7B9080;
+            --primary-hover: #6A7E6F;
+            --primary-light: #EBF0EC;
+            --primary-bg: #F5F8F6;
+            --accent: #9CAF9A;
+            --accent-hover: #8A9D87;
+            --accent-light: #E8EDE6;
+            --bg: #F7F8F6;
+            --surface: #FFFFFF;
+            --sidebar-surface: #FCFCFB;
+            --text: #2D3431;
+            --text-secondary: #6B7670;
+            --text-muted: #A8ADA6;
+            --border: #E4E7E2;
+            --border-strong: #CDD2CB;
+            --shadow: 0 4px 24px rgba(123, 144, 128, 0.08);
+            --shadow-sm: 0 2px 8px rgba(123, 144, 128, 0.05);
+            --shadow-lg: 0 12px 48px rgba(123, 144, 128, 0.12);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --radius-lg: 24px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-primary: linear-gradient(135deg, #7B9080, #9CAF9A);
+            --gradient-accent: linear-gradient(135deg, #9CAF9A, #B5C4B0);
+            --gradient-bg: linear-gradient(135deg, #F5F8F6 0%, #EBF0EC 40%, #E0E8E1 100%);
+        }
+        [data-theme="misty-blue"] {
+            --primary: #6B8CAE; --primary-hover: #5A7A9C; --primary-light: #EAF0F5; --primary-bg: #F4F7FA;
+            --accent: #8FA8C2; --accent-light: #E6EDF3;
+            --bg: #F6F8FA; --surface: #FFFFFF; --sidebar-surface: #FBFCFD;
+            --text: #2A3340; --text-secondary: #677689; --text-muted: #A8B2BF;
+            --border: #E2E8EF; --border-strong: #CCD6E1;
+            --shadow: 0 4px 24px rgba(107, 140, 174, 0.08); --shadow-sm: 0 2px 8px rgba(107, 140, 174, 0.05); --shadow-lg: 0 12px 48px rgba(107, 140, 174, 0.12);
+            --gradient-primary: linear-gradient(135deg, #6B8CAE, #8FA8C2);
+            --gradient-bg: linear-gradient(135deg, #F4F7FA 0%, #EAF0F5 40%, #DDE7F0 100%);
+        }
+        [data-theme="dusty-rose"] {
+            --primary: #B07E85; --primary-hover: #9D6E75; --primary-light: #F5EDEF; --primary-bg: #FAF5F6;
+            --accent: #C4989E; --accent-light: #F0E7E9;
+            --bg: #F8F6F7; --surface: #FFFFFF; --sidebar-surface: #FCFBFC;
+            --text: #3D2D30; --text-secondary: #786267; --text-muted: #B0A2A6;
+            --border: #EEE4E6; --border-strong: #DCCED1;
+            --shadow: 0 4px 24px rgba(176, 126, 133, 0.08); --shadow-sm: 0 2px 8px rgba(176, 126, 133, 0.05); --shadow-lg: 0 12px 48px rgba(176, 126, 133, 0.12);
+            --gradient-primary: linear-gradient(135deg, #B07E85, #C4989E);
+            --gradient-bg: linear-gradient(135deg, #FAF5F6 0%, #F5EDEF 40%, #ECDDE1 100%);
+        }
+        [data-theme="mauve"] {
+            --primary: #9B8AA4; --primary-hover: #8A7993; --primary-light: #F2EFF4; --primary-bg: #F7F5F8;
+            --accent: #B0A0B8; --accent-light: #EDE8F1;
+            --bg: #F6F5F7; --surface: #FFFFFF; --sidebar-surface: #FBFBFC;
+            --text: #332D38; --text-secondary: #6E6575; --text-muted: #ADA4B3;
+            --border: #E8E4EC; --border-strong: #D1CCD8;
+            --shadow: 0 4px 24px rgba(155, 138, 164, 0.08); --shadow-sm: 0 2px 8px rgba(155, 138, 164, 0.05); --shadow-lg: 0 12px 48px rgba(155, 138, 164, 0.12);
+            --gradient-primary: linear-gradient(135deg, #9B8AA4, #B0A0B8);
+            --gradient-bg: linear-gradient(135deg, #F7F5F8 0%, #F2EFF4 40%, #E6E0ED 100%);
+        }
+        [data-theme="warm-gray"] {
+            --primary: #8A8580; --primary-hover: #79746F; --primary-light: #EFEDEB; --primary-bg: #F5F4F2;
+            --accent: #A5A09A; --accent-light: #E8E6E3;
+            --bg: #F6F5F4; --surface: #FFFFFF; --sidebar-surface: #FBFAF9;
+            --text: #33312E; --text-secondary: #6E6A65; --text-muted: #ABA7A2;
+            --border: #E6E3E0; --border-strong: #CFCBC7;
+            --shadow: 0 4px 24px rgba(138, 133, 128, 0.08); --shadow-sm: 0 2px 8px rgba(138, 133, 128, 0.05); --shadow-lg: 0 12px 48px rgba(138, 133, 128, 0.12);
+            --gradient-primary: linear-gradient(135deg, #8A8580, #A5A09A);
+            --gradient-bg: linear-gradient(135deg, #F5F4F2 0%, #EFEDEB 40%, #E2DFDC 100%);
+        }
+        [data-theme="terracotta"] {
+            --primary: #B89B85; --primary-hover: #A58974; --primary-light: #F4EFEA; --primary-bg: #F9F6F3;
+            --accent: #CCB099; --accent-light: #F0E8E0;
+            --bg: #F8F6F4; --surface: #FFFFFF; --sidebar-surface: #FCFAF8;
+            --text: #3A322A; --text-secondary: #756560; --text-muted: #B0A59B;
+            --border: #EEE8E2; --border-strong: #D8CFC5;
+            --shadow: 0 4px 24px rgba(184, 155, 133, 0.08); --shadow-sm: 0 2px 8px rgba(184, 155, 133, 0.05); --shadow-lg: 0 12px 48px rgba(184, 155, 133, 0.12);
+            --gradient-primary: linear-gradient(135deg, #B89B85, #CCB099);
+            --gradient-bg: linear-gradient(135deg, #F9F6F3 0%, #F4EFEA 40%, #E8DDD2 100%);
+        }
+        /* 夜间模式 - 莫兰迪深灰 */
+        [data-mode="dark"] {
+            --bg: #2D3330; --surface: #383E3A; --sidebar-surface: #252A28;
+            --text: #E5E3DE; --text-secondary: #9A9790; --text-muted: #6B6863;
+            --border: #4A4F4B; --border-strong: #5E645F;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3); --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25); --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.4);
+        }
+        [data-mode="dark"][data-theme="misty-blue"] { --primary-light: #2A3642; --primary-bg: #242E38; }
+        [data-mode="dark"][data-theme="dusty-rose"] { --primary-light: #3A282C; --primary-bg: #322024; }
+        [data-mode="dark"][data-theme="mauve"] { --primary-light: #2E2836; --primary-bg: #282230; }
+        [data-mode="dark"][data-theme="warm-gray"] { --primary-light: #2D2B28; --primary-bg: #262422; }
+        [data-mode="dark"][data-theme="terracotta"] { --primary-light: #362C24; --primary-bg: #2E261E; }
+        /* 主题色块背景 */
+        .theme-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-strong); cursor: pointer; transition: all var(--transition); position: relative; flex-shrink: 0; }
+        .theme-dot.active { border-color: var(--primary); transform: scale(1.1); box-shadow: 0 0 0 3px var(--primary-light); }
+        .theme-dot[data-theme="sage"] { background: #7B9080; }
+        .theme-dot[data-theme="misty-blue"] { background: #6B8CAE; }
+        .theme-dot[data-theme="dusty-rose"] { background: #B07E85; }
+        .theme-dot[data-theme="mauve"] { background: #9B8AA4; }
+        .theme-dot[data-theme="warm-gray"] { background: #8A8580; }
+        .theme-dot[data-theme="terracotta"] { background: #B89B85; }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sidebar-nav {
+            display: flex;
+            gap: 8px;
+        }
+        .nav-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all var(--transition);
+        }
+        .nav-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .settings-panel {
+            display: none;
+            padding: 14px 16px;
+            background: var(--primary-bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            margin-top: 8px;
+        }
+        .settings-panel.show { display: block; animation: fadeIn 0.2s ease-out; }
+        .settings-panel h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        .setting-row-label {
+            font-size: 13px;
+            color: var(--text);
+        }
+        .theme-grid {
+            display: flex;
+            gap: 8px;
+        }
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+        .icon-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .icon-btn.active {
+            background: var(--gradient-primary);
+            color: #fff;
+            border-color: transparent;
+        }
+        .chat-header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .header-icon-btn {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+        .header-icon-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--primary-bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .user-info { flex: 1; min-width: 0; }
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .user-email {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .login-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all var(--transition);
+        }
+        .login-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .login-btn.logged-in {
+            background: var(--gradient-primary);
+            color: #fff;
+            border-color: transparent;
+        }
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all var(--transition);
+        }
+        .logout-btn:hover {
+            background: rgba(225, 29, 72, 0.08);
+            color: #E11D48;
+            border-color: rgba(225, 29, 72, 0.4);
+        }
+        .session-empty-hint {
+            margin: 32px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            opacity: 0.75;
+        }
+        .session-empty-hint svg { opacity: 0.5; margin-bottom: 10px; }
+        .session-empty-hint p { font-size: 13px; line-height: 1.6; margin: 0; }
+        .login-form {
+            display: none;
+            padding: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+        }
+        .login-form.show { display: block; animation: fadeIn 0.2s ease-out; }
+        .login-form input {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            font-size: 13px;
+            font-family: inherit;
+            background: var(--bg);
+            color: var(--text);
+            transition: all var(--transition);
+        }
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        .login-form .submit-login {
+            width: 100%;
+            padding: 10px;
+            background: var(--gradient-primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-xs);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--surface);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 2000;
+            transition: transform 0.3s ease-out;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { border-left: 4px solid #10B981; }
+        .toast.error { border-left: 4px solid #EF4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0" y1="0" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#7B9080"/>
+                                <stop offset="1" stop-color="#9CAF9A"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="3" y="8" width="32" height="22" rx="4" fill="url(#logoGrad)"/>
+                        <path d="M4 12L19 23L34 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="19" cy="19" r="7" fill="white" opacity="0.25"/>
+                    </svg>
+                    <span class="logo-text">MailFriend</span>
+                </div>
+                <button class="new-session-btn" id="newSessionBtn" onclick="createSession()">
+                    <span style="margin-right:6px">+</span> 新建会话
+                </button>
+            </div>
+
+            <div style="padding: 16px 20px 0;">
+                <div id="userArea">
+                    <div class="user-profile" id="userProfile" style="display:none;">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <div class="user-info" style="flex:1;">
+                            <div class="user-name" id="userName">用户</div>
+                            <div class="user-email" id="userEmail">未登录</div>
+                        </div>
+                        <button class="logout-btn" id="logoutBtn" onclick="doLogout()" title="退出登录">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="16 17 21 12 16 7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="batch-toolbar" id="batchToolbar">
+                <span class="batch-toolbar-title">会话记录</span>
+                <button class="batch-edit-btn" id="batchEditBtn" title="批量管理">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    批量管理
+                </button>
+            </div>
+            <div class="session-list" id="sessionList">
+                <!-- 未登录时的占位提示 -->
+                <div class="session-empty-hint" id="sessionEmptyHint">
+                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+                    <p>请先登录邮箱账号<br/>查看和管理您的邮件会话</p>
+                </div>
+            </div>
+            <div class="batch-action-bar" id="batchActionBar">
+                <label class="batch-select-all">
+                    <input type="checkbox" id="batchSelectAll">
+                    <span>全选</span>
+                </label>
+                <span class="batch-count" id="batchCount">已选 0 项</span>
+                <div class="batch-action-btns">
+                    <button class="batch-action-btn batch-delete-btn" id="batchDeleteBtn">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        删除所选
+                    </button>
+                    <button class="batch-action-btn batch-cancel-btn" id="batchCancelBtn">取消</button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-nav">
+                    <button class="nav-btn" onclick="goHome()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        首页
+                    </button>
+                    <button class="nav-btn" onclick="toggleSettings()" id="settingsToggle">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                        设置
+                    </button>
+                    <button class="nav-btn" onclick="toggleLoginForm()" id="loginBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                            <polyline points="10 17 15 12 10 7"/>
+                            <line x1="15" y1="12" x2="3" y2="12"/>
+                        </svg>
+                        <span id="loginBtnText">登录</span>
+                    </button>
+                </div>
+
+                <div class="login-form" id="loginForm">
+                    <input type="text" id="loginEmail" placeholder="邮箱地址 (如 xxx@163.com)">
+                    <input type="password" id="loginAuthCode" placeholder="客户端授权码">
+                    <button class="submit-login" onclick="doLogin()">连接邮箱</button>
+                </div>
+
+                <div class="settings-panel" id="settingsPanel">
+                    <h4>主题颜色</h4>
+                    <div class="theme-grid" style="display:flex;flex-wrap:wrap;gap:8px;">
+                        <button class="theme-dot active" data-theme="sage" onclick="setTheme('sage')" title="鼠尾草绿"></button>
+                        <button class="theme-dot" data-theme="misty-blue" onclick="setTheme('misty-blue')" title="雾霾蓝"></button>
+                        <button class="theme-dot" data-theme="dusty-rose" onclick="setTheme('dusty-rose')" title="灰玫瑰"></button>
+                        <button class="theme-dot" data-theme="mauve" onclick="setTheme('mauve')" title="藕荷紫"></button>
+                        <button class="theme-dot" data-theme="warm-gray" onclick="setTheme('warm-gray')" title="暖灰"></button>
+                        <button class="theme-dot" data-theme="terracotta" onclick="setTheme('terracotta')" title="陶土"></button>
+                    </div>
+                    <div class="setting-row" style="margin-top: 14px;">
+                        <span class="setting-row-label">夜间模式</span>
+                        <button class="icon-btn" id="darkModeBtn" onclick="toggleDarkMode()" title="切换夜间模式">
+                            <svg id="darkIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                <span class="status-dot"></span>
+                <h3 id="chatTitle">选择一个会话开始聊天</h3>
+                <div class="chat-header-actions">
+                    <button class="header-icon-btn" onclick="toggleDarkMode()" title="切换夜间模式">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                    <button class="header-icon-btn" onclick="goHome()" title="返回首页">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="empty-state" id="emptyState">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+                    </svg>
+                    <p>选择会话或创建新会话，开始使用 MailFriend</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <textarea class="chat-input" id="messageInput" placeholder="请先登录邮箱账号后再发送消息..." rows="1" disabled></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="hitlModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>
+                    <svg class="modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    确认操作
+                </h3>
+                <button class="modal-close" onclick="closeHitlModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="hitlModalBody"></div>
+            <div class="modal-footer" id="hitlModalFooter">
+                <button class="modal-btn cancel" onclick="closeHitlModal()">取消</button>
+                <button class="modal-btn edit" onclick="showEditMode()">Edit</button>
+                <button class="modal-btn reject" onclick="rejectInterrupt()">Reject</button>
+                <button class="modal-btn approve" onclick="approveInterrupt()">Approve</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="rejectModal">
+        <div class="modal" style="width: 440px;">
+            <div class="modal-header">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #DC2626;">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    拒绝操作
+                </h3>
+                <button class="modal-close" onclick="closeRejectModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="param-group">
+                    <label class="param-label">拒绝原因（可选）</label>
+                    <textarea class="edit-input" id="rejectReasonInput"
+                              placeholder="输入拒绝原因，帮助 AI 改进回复…"
+                              style="min-height: 80px; width: 100%;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeRejectModal()">取消</button>
+                <button class="modal-btn reject" onclick="confirmReject()">确认拒绝</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="/app.js?v=20260823"></script>
+    <script>
+        function goHome() { window.location.href = '/'; }
+
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('show');
+        }
+
+        function setTheme(theme) {
+            if (theme === 'sage') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            localStorage.setItem('theme', theme);
+            document.querySelectorAll('.theme-dot').forEach(d => {
+                d.classList.toggle('active', d.dataset.theme === theme);
+            });
+            showToast('主题已切换', 'success');
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-mode') === 'dark';
+            if (isDark) {
+                html.removeAttribute('data-mode');
+                localStorage.setItem('mode', 'light');
+            } else {
+                html.setAttribute('data-mode', 'dark');
+                localStorage.setItem('mode', 'dark');
+            }
+            showToast(isDark ? '已切换到浅色模式' : '已切换到夜间模式', 'success');
+        }
+
+        function applySavedTheme() {
+            const validThemes = ['sage', 'misty-blue', 'dusty-rose', 'mauve', 'warm-gray', 'terracotta'];
+            let savedTheme = localStorage.getItem('theme') || 'sage';
+            if (!validThemes.includes(savedTheme)) {
+                savedTheme = 'sage';
+                localStorage.setItem('theme', 'sage');
+            }
+            const savedMode = localStorage.getItem('mode') || 'light';
+            if (savedTheme !== 'sage') {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+            if (savedMode === 'dark') {
+                document.documentElement.setAttribute('data-mode', 'dark');
+            }
+            document.querySelectorAll('.theme-dot').forEach(d => {
+                d.classList.toggle('active', d.dataset.theme === savedTheme);
+            });
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function toggleLoginForm() {
+            const form = document.getElementById('loginForm');
+            const user = localStorage.getItem('mailfriend_current_user');
+            
+            if (user) {
+                // 已登录：弹出选择菜单（切换账号 / 退出登录）
+                const choice = prompt(
+                    '当前已登录为 ' + user + '\n\n' +
+                    '请选择操作：\n' +
+                    '  1 - 切换到其他邮箱账号\n' +
+                    '  2 - 退出当前账号\n\n' +
+                    '输入数字 1 或 2（留空或取消 = 不操作）：',
+                    ''
+                );
+                if (choice === '1') {
+                    // 清除当前用户，显示登录表单
+                    _clearAuthState(true);
+                    form.classList.add('show');
+                } else if (choice === '2') {
+                    if (confirm('确定要退出登录 ' + user + ' 吗？\n\n退出后左侧会话将被清空，需要重新登录才能查看邮件。')) {
+                        doLogout();
+                    }
+                }
+            } else {
+                // 未登录：直接显示登录表单
+                form.classList.toggle('show');
+            }
+        }
+
+        /**
+         * 退出登录：清除所有本地认证信息和会话显示
+         */
+        function doLogout() {
+            _clearAuthState(false);
+            showToast('已退出登录', 'success');
+            // 重载页面确保所有状态重置
+            setTimeout(function () { window.location.reload(); }, 400);
+        }
+
+        /**
+         * 内部：清除认证相关状态（localStorage + UI）
+         * @param {boolean} keepLoginFormOpen - 是否保持登录表单展开（切换账号时用）
+         */
+        function _clearAuthState(keepLoginFormOpen) {
+            localStorage.removeItem('mailfriend_current_user');
+            localStorage.removeItem('mailfriend_user_id');
+            localStorage.removeItem('mailfriend_thread_id');
+            // 同步 app.js 的 USER_ID
+            if (typeof window.resetAppForLogout === 'function') {
+                window.resetAppForLogout();
+            }
+            updateUserArea();
+            if (!keepLoginFormOpen) {
+                var f = document.getElementById('loginForm');
+                if (f) f.classList.remove('show');
+            }
+        }
+
+        function doLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const authCode = document.getElementById('loginAuthCode').value.trim();
+            if (!email || !authCode) {
+                showToast('请输入邮箱地址和授权码', 'error');
+                return;
+            }
+            if (!email.includes('@')) {
+                showToast('请输入正确的邮箱地址', 'error');
+                return;
+            }
+
+            showToast('正在连接邮箱服务器...', 'success');
+
+            // 调用后端验证邮箱连接
+            fetch('/api/v1/email/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, auth_code: authCode })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('已连接到 ' + email, 'success');
+                    
+                    // 清除旧用户的会话数据
+                    const oldUser = localStorage.getItem('mailfriend_current_user');
+                    if (oldUser && oldUser !== email) {
+                        // 用户切换了，清除旧会话
+                        console.log('切换用户：' + oldUser + ' -> ' + email);
+                    }
+                    
+                    // 保存新用户信息
+                    localStorage.setItem('mailfriend_current_user', email);
+                    localStorage.setItem('mailfriend_user_id', email);
+                    
+                    // 更新 app.js 中的 USER_ID
+                    if (typeof window.updateUserId === 'function') {
+                        window.updateUserId();
+                    }
+                    
+                    updateUserArea();
+                    document.getElementById('loginForm').classList.remove('show');
+                    
+                    // 如果后端返回了 thread_id，保存它
+                    if (data.thread_id) {
+                        localStorage.setItem('mailfriend_thread_id', data.thread_id);
+                    }
+                    
+                    // 清空输入框
+                    document.getElementById('loginEmail').value = '';
+                    document.getElementById('loginAuthCode').value = '';
+                    
+                    // 切换用户后刷新页面以加载新会话
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 800);
+                } else {
+                    showToast(data.message || '连接失败，请检查邮箱和授权码', 'error');
+                }
+            })
+            .catch(function(err) {
+                console.error('登录失败:', err);
+                showToast('连接失败，请稍后重试', 'error');
+            });
+        }
+
+        function updateUserArea() {
+            const user = localStorage.getItem('mailfriend_current_user');
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const userProfile = document.getElementById('userProfile');
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const userAvatar = document.getElementById('userAvatar');
+
+            if (user) {
+                loginBtn.classList.add('logged-in');
+                loginBtnText.textContent = user.split('@')[0];
+                userProfile.style.display = 'flex';
+                userName.textContent = user;
+                userEmail.textContent = '已连接';
+                userAvatar.textContent = user.charAt(0).toUpperCase();
+            } else {
+                loginBtn.classList.remove('logged-in');
+                loginBtnText.textContent = '登录';
+                userProfile.style.display = 'none';
+            }
+        }
+
+        applySavedTheme();
+        updateUserArea();
+    </script>
+</body>
+</html>

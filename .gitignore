@@ -1,0 +1,55 @@
+# ===== 敏感文件(严禁提交)=====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ===== 数据库(含用户数据)=====
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+app/db/
+db/
+
+# ===== 临时文件 =====
+tmp_*.txt
+*.tmp
+*.log
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Node.js(前端如有依赖)=====
+node_modules/
+
+# ===== LangSmith 追踪缓存 =====
+.langsmith/
