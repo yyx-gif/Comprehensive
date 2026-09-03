@@ -182,14 +182,34 @@
     --primary-bg: #16110D;
 }
 
+/* ========== 全局字体基准：默认 16px 起步，避免整站字体偏小 ========== */
+html { font-size: 16px; }
+@media (min-width: 1280px) { html { font-size: 17px; } }
+@media (min-width: 1680px) { html { font-size: 18px; } }
+@media (max-width: 768px)  { html { font-size: 15px; } }
+
+:root {
+    --fs-xs: 0.8125rem;   /* 13px 基下 13 */
+    --fs-sm: 0.9375rem;   /* 15px 基下 15 */
+    --fs-base: 1rem;       /* 16/17/18px 由上面动态控制 */
+    --fs-md: 1.0625rem;    /* 17px 基下 18 */
+    --fs-lg: 1.125rem;     /* 18px 基下 20 */
+    --fs-xl: 1.25rem;      /* 20px 基下 22 */
+    --fs-2xl: 1.5rem;      /* 24px 基下 27 */
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    font-size: var(--fs-base);
+    line-height: 1.65;
     height: 100vh;
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     transition: background-color var(--transition), color var(--transition);
 }
 
@@ -222,7 +242,7 @@ body {
 .logo-icon { width: 38px; height: 38px; flex-shrink: 0; }
 
 .logo-text {
-    font-size: 22px;
+    font-size: var(--fs-xl);
     font-weight: 700;
     letter-spacing: -0.3px;
     background: var(--gradient-primary);
@@ -239,7 +259,7 @@ body {
     border: none;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 14px;
+    font-size: var(--fs-base);
     font-weight: 600;
     letter-spacing: 0.2px;
     transition: all var(--transition);
@@ -282,7 +302,7 @@ body {
 }
 
 .session-item .session-time {
-    font-size: 13px;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: var(--text);
     margin-bottom: 6px;
@@ -304,7 +324,7 @@ body {
 .session-item.active .session-time .dot { opacity: 1; }
 
 .session-item .session-summary {
-    font-size: 13px;
+    font-size: var(--fs-sm);
     color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
@@ -324,7 +344,7 @@ body {
     background: transparent;
     color: var(--text-muted);
     cursor: pointer;
-    font-size: 16px;
+    font-size: var(--fs-md);
     opacity: 0;
     transition: all var(--transition);
     display: flex;
@@ -346,7 +366,7 @@ body {
     background: var(--surface);
 }
 .batch-toolbar-title {
-    font-size: 12px;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -360,7 +380,7 @@ body {
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--fs-xs);
     cursor: pointer;
     transition: all var(--transition);
 }
@@ -403,7 +423,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: var(--fs-xs);
     color: var(--text-secondary);
     cursor: pointer;
 }
@@ -414,7 +434,7 @@ body {
     cursor: pointer;
 }
 .batch-count {
-    font-size: 12px;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     flex: 1;
     min-width: 60px;
@@ -431,7 +451,7 @@ body {
     border: 1px solid var(--border);
     background: transparent;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--fs-xs);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -473,7 +493,7 @@ body {
     z-index: 5;
 }
 
-.chat-header h3 { font-size: 16px; font-weight: 600; color: var(--text); }
+.chat-header h3 { font-size: var(--fs-md); font-weight: 600; color: var(--text); }
 
 .chat-header .status-dot {
     width: 8px;
@@ -521,7 +541,7 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 15px;
+    font-size: var(--fs-base);
     font-weight: 600;
 }
 
@@ -544,8 +564,8 @@ body {
 .message-bubble {
     padding: 14px 18px;
     border-radius: var(--radius);
-    font-size: 14px;
-    line-height: 1.7;
+    font-size: var(--fs-base);
+    line-height: 1.75;
     word-break: break-word;
 }
 
@@ -578,7 +598,7 @@ body {
     padding: 12px 18px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
-    font-size: 14px;
+    font-size: var(--fs-base);
     resize: none;
     outline: none;
     font-family: inherit;
@@ -604,7 +624,7 @@ body {
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 18px;
+    font-size: var(--fs-lg);
     transition: all var(--transition);
     flex-shrink: 0;
     box-shadow: var(--shadow-sm);
@@ -637,7 +657,7 @@ body {
 }
 
 .empty-state svg { width: 72px; height: 72px; opacity: 0.4; }
-.empty-state p { font-size: 15px; }
+.empty-state p { font-size: var(--fs-base); }
 
 .modal-overlay {
     position: fixed;
@@ -679,7 +699,7 @@ body {
 }
 
 .modal-header h3 {
-    font-size: 18px;
+    font-size: var(--fs-lg);
     font-weight: 700;
     color: var(--text);
     display: flex;
@@ -697,7 +717,7 @@ body {
     background: transparent;
     cursor: pointer;
     color: var(--text-muted);
-    font-size: 22px;
+    font-size: var(--fs-2xl);
     transition: all var(--transition);
     display: flex;
     align-items: center;
@@ -717,7 +737,7 @@ body {
 
 .modal-body .param-label {
     display: block;
-    font-size: 12px;
+    font-size: var(--fs-xs);
     color: var(--text-secondary);
     margin-bottom: 6px;
     font-weight: 600;
@@ -726,7 +746,7 @@ body {
 }
 
 .modal-body .param-value {
-    font-size: 14px;
+    font-size: var(--fs-base);
     color: var(--text);
     padding: 10px 14px;
     background: var(--bg);
@@ -742,7 +762,7 @@ body {
     padding: 10px 14px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-xs);
-    font-size: 14px;
+    font-size: var(--fs-base);
     font-family: inherit;
     background: var(--bg);
     color: var(--text);
@@ -773,7 +793,7 @@ body {
 .modal-btn {
     padding: 10px 22px;
     border-radius: var(--radius-xs);
-    font-size: 14px;
+    font-size: var(--fs-base);
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition);
@@ -837,7 +857,7 @@ body {
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
-    font-size: 13px;
+    font-size: var(--fs-xs);
 }
 
 .message.user .message-bubble code { background: rgba(255, 255, 255, 0.2); }
@@ -892,6 +912,11 @@ body {
 .theme-dot[data-theme="terracotta"] { background: #B89B85; }
 
 @media (max-width: 768px) {
+    .chat-header { padding: 14px 16px; }
+    .chat-messages { padding: 18px 14px; }
+    .chat-input-area { padding: 14px 16px; }
+    .message { margin-bottom: 18px; }
+    .message-bubble { padding: 11px 14px; }
     .sidebar {
         width: 260px;
         position: absolute;

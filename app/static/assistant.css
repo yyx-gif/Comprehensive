@@ -54,12 +54,20 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; }
+@media (min-width: 1280px) { html { font-size: 17px; } }
+@media (min-width: 1680px) { html { font-size: 18px; } }
+@media (max-width: 768px)  { html { font-size: 15px; } }
 html, body { height: 100%; transition: background 0.3s ease, color 0.3s ease; }
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 1rem;
+    line-height: 1.65;
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 .app-container {
@@ -101,7 +109,7 @@ body {
 .back-home:hover { background: var(--primary-light); color: var(--primary); }
 .sidebar-brand {
     flex: 1;
-    font-size: 16px;
+    font-size: 1.0625rem;
     font-weight: 700;
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     -webkit-background-clip: text;
@@ -148,7 +156,7 @@ body {
 .session-item.active { background: var(--primary-light); border: 1px solid var(--border); }
 .session-info { flex: 1; min-width: 0; }
 .session-title {
-    font-size: 13px;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--text);
     white-space: nowrap;
@@ -156,7 +164,7 @@ body {
     text-overflow: ellipsis;
 }
 .session-meta {
-    font-size: 11px;
+    font-size: 0.75rem;
     color: var(--text-muted);
     margin-top: 2px;
 }
@@ -180,7 +188,7 @@ body {
     text-align: center;
     padding: 40px 20px;
     color: var(--text-muted);
-    font-size: 14px;
+    font-size: 0.9375rem;
 }
 
 /* ====== 批量管理工具栏 ====== */
@@ -194,7 +202,7 @@ body {
     background: var(--surface);
 }
 .batch-toolbar-title {
-    font-size: 12px;
+    font-size: 0.8125rem;
     color: var(--text-muted);
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -208,7 +216,7 @@ body {
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 0.8125rem;
     cursor: pointer;
     transition: all var(--transition);
 }
@@ -257,7 +265,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 0.8125rem;
     color: var(--text-secondary);
     cursor: pointer;
 }
@@ -268,7 +276,7 @@ body {
     cursor: pointer;
 }
 .batch-count {
-    font-size: 12px;
+    font-size: 0.8125rem;
     color: var(--text-muted);
     flex: 1;
     min-width: 60px;
@@ -285,7 +293,7 @@ body {
     border: 1px solid var(--border);
     background: transparent;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 0.8125rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -321,12 +329,12 @@ body {
     background: var(--surface);
 }
 .chat-title {
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--text);
 }
 .chat-subtitle {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--text-muted);
     margin-top: 2px;
 }
@@ -348,8 +356,8 @@ body {
     padding: 40px;
 }
 .empty-icon { font-size: 56px; margin-bottom: 16px; }
-.empty-title { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-.empty-desc { font-size: 14px; color: var(--text-muted); }
+.empty-title { font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.empty-desc { font-size: 0.9375rem; color: var(--text-muted); }
 
 /* ====== 消息气泡 ====== */
 .msg {
@@ -370,7 +378,7 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 18px;
+    font-size: 1.125rem;
 }
 .msg-assistant .msg-avatar {
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
@@ -383,7 +391,7 @@ body {
 .msg-content {
     padding: 14px 18px;
     border-radius: var(--radius);
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.8;
     word-break: break-word;
 }
@@ -399,9 +407,9 @@ body {
 .msg-content p { margin: 0.5em 0; }
 .msg-content p:first-child { margin-top: 0; }
 .msg-content p:last-child { margin-bottom: 0; }
-.msg-content h1 { font-size: 22px; margin: 0.8em 0; font-weight: 700; }
-.msg-content h2 { font-size: 20px; margin: 0.8em 0; font-weight: 700; }
-.msg-content h3 { font-size: 18px; margin: 0.6em 0; font-weight: 600; }
+.msg-content h1 { font-size: 1.5rem; margin: 0.8em 0; font-weight: 700; }
+.msg-content h2 { font-size: 1.375rem; margin: 0.8em 0; font-weight: 700; }
+.msg-content h3 { font-size: 1.25rem; margin: 0.6em 0; font-weight: 600; }
 .msg-content ul, .msg-content ol { margin: 0.5em 0; padding-left: 1.5em; }
 .msg-content li { margin: 0.3em 0; }
 .msg-content code {
@@ -409,7 +417,7 @@ body {
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'Courier New', monospace;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 .msg-content pre {
     background: #1e1e2e;
@@ -423,13 +431,13 @@ body {
     background: transparent;
     padding: 0;
     color: inherit;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 .msg-content table {
     width: 100%;
     border-collapse: collapse;
     margin: 0.8em 0;
-    font-size: 14px;
+    font-size: 0.9375rem;
 }
 .msg-content th, .msg-content td {
     border: 1px solid var(--border);
@@ -449,7 +457,7 @@ body {
 /* 思考过程样式 */
 .msg-content.thinking {
     color: var(--text-muted);
-    font-size: 15px;
+    font-size: 0.9375rem;
     opacity: 0.75;
     border-left: 3px solid var(--border);
     padding-left: 12px;
@@ -457,7 +465,7 @@ body {
 .msg-content.thinking::before {
     content: '思考中...';
     display: block;
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--text-muted);
     margin-bottom: 6px;
     font-style: italic;
@@ -485,7 +493,7 @@ body {
     border: none;
     outline: none;
     background: transparent;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-family: inherit;
     color: var(--text);
     resize: none;
@@ -569,7 +577,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 .settings-popover h4 {
-    font-size: 12px;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: var(--text-secondary);
     margin-bottom: 12px;
@@ -609,7 +617,7 @@ body {
     padding: 8px 0;
 }
 .setting-row-label {
-    font-size: 13px;
+    font-size: 0.875rem;
     color: var(--text);
 }
 .dark-toggle {
@@ -646,6 +654,8 @@ body {
     .sidebar.show { transform: translateX(0); }
     .chat-area { padding: 16px; }
     .msg { max-width: 95%; }
-    .msg-content { font-size: 15px; }
+    .msg-content { font-size: 1rem; line-height: 1.7; }
+    .input-area { padding: 12px 14px; }
+    .chat-header { padding: 12px 16px; }
     .settings-popover { left: 12px; bottom: 60px; }
 }

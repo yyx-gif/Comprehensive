@@ -467,7 +467,11 @@ async function sendMessage() {
         const response = await fetch(`${API_BASE}/api/v1/email/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: message, thread_id: currentThreadId })
+            body: JSON.stringify({
+                message: message,
+                thread_id: currentThreadId,
+                user_id: USER_ID || undefined
+            })
         });
 
         const reader = response.body.getReader();
@@ -604,7 +608,8 @@ async function sendInterruptDecision(decision) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 thread_id: currentThreadId,
-                interrupt_decision: decision
+                interrupt_decision: decision,
+                user_id: USER_ID || undefined
             })
         });
 

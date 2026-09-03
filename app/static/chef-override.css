@@ -26,32 +26,42 @@
     --gradient-primary: linear-gradient(135deg, #7B9080, #9CAF9A);
     --gradient-bg: linear-gradient(135deg, #F5F8F6 0%, #EBF0EC 40%, #E0E8E1 100%);
     --chef-sidebar-w: 260px;
+
+    /* 统一字体相对单位（避免整站字体偏小） */
+    --fs-xs: 0.8125rem;
+    --fs-sm: 0.9375rem;
+    --fs-base: 1rem;
+    --fs-md: 1.0625rem;
+    --fs-lg: 1.125rem;
+    --fs-xl: 1.25rem;
+    --fs-2xl: 1.375rem;
+    --fs-3xl: 1.625rem;
 }
 
-/* ========== 强制字体大小覆盖（仅限消息区域） ========== */
+/* ========== 强制字体大小覆盖（仅限消息区域，使用 rem 随 html 基准放大） ========== */
 .chef-msg-content {
-    font-size: 17px !important;
+    font-size: var(--fs-md) !important;
     line-height: 1.8 !important;
 }
 
 .chef-msg-content p,
 .chef-msg-content li,
 .chef-msg-content div {
-    font-size: 17px !important;
+    font-size: var(--fs-md) !important;
     line-height: 1.8 !important;
 }
 
 .chef-msg-content h1 {
-    font-size: 26px !important;
+    font-size: var(--fs-3xl) !important;
 }
 .chef-msg-content h2 {
-    font-size: 22px !important;
+    font-size: var(--fs-2xl) !important;
 }
 .chef-msg-content h3 {
-    font-size: 20px !important;
+    font-size: var(--fs-xl) !important;
 }
 .chef-msg-content h4 {
-    font-size: 18px !important;
+    font-size: var(--fs-lg) !important;
 }
 
 [data-theme="misty-blue"] {
@@ -113,7 +123,21 @@
     --shadow: 0 4px 24px rgba(0, 0, 0, 0.3); --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25); --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.4);
 }
 
-html, body { transition: background 0.3s ease, color 0.3s ease; }
+html, body {
+    font-size: 16px !important;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+@media (min-width: 1280px) { html, body { font-size: 17px !important; } }
+@media (min-width: 1680px) { html, body { font-size: 18px !important; } }
+@media (max-width: 768px)  { html, body { font-size: 15px !important; } }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+    font-size: 1rem !important;
+    line-height: 1.65 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
 [data-mode="dark"] body { background: var(--bg) !important; }
 
 /* ========== 1. 隐藏原始顶部 header ========== */
@@ -423,7 +447,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 }
 .chef-session-brand-icon svg { width: 18px; height: 18px; }
 .chef-session-brand-text {
-    font-size: 16px;
+    font-size: var(--fs-md);
     font-weight: 700;
     background: var(--gradient-primary);
     -webkit-background-clip: text;
@@ -437,7 +461,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     color: #fff;
     border: none;
     border-radius: var(--radius-sm);
-    font-size: 13px;
+    font-size: var(--fs-sm);
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -474,7 +498,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     background: var(--surface);
 }
 .chef-batch-toolbar-title {
-    font-size: 12px;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -488,7 +512,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--fs-xs);
     cursor: pointer;
     transition: all var(--transition);
 }
@@ -531,7 +555,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: var(--fs-xs);
     color: var(--text-secondary);
     cursor: pointer;
 }
@@ -542,7 +566,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     cursor: pointer;
 }
 .chef-batch-count {
-    font-size: 12px;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     flex: 1;
     min-width: 60px;
@@ -559,7 +583,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     border: 1px solid var(--border);
     background: transparent;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--fs-xs);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -605,7 +629,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     min-width: 0;
 }
 .chef-session-title {
-    font-size: 13px;
+    font-size: var(--fs-sm);
     font-weight: 600;
     color: var(--text);
     margin-bottom: 2px;
@@ -614,7 +638,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     text-overflow: ellipsis;
 }
 .chef-session-meta {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--text-muted);
 }
 .chef-session-delete {
@@ -645,7 +669,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     text-align: center;
     padding: 40px 20px;
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: var(--fs-sm);
 }
 .chef-session-footer {
     padding: 12px 16px;
@@ -661,7 +685,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--fs-xs);
     font-weight: 500;
     cursor: pointer;
     display: flex;
@@ -708,7 +732,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     background: var(--surface);
 }
 .chef-settings-popover h4 {
-    font-size: 12px;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--text-secondary);
     margin-bottom: 12px;
@@ -749,7 +773,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     padding: 8px 0;
 }
 .chef-setting-row-label {
-    font-size: 13px;
+    font-size: var(--fs-sm);
     color: var(--text);
 }
 .chef-dark-toggle {
@@ -851,7 +875,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     max-width: 80%;
     padding: 16px 20px;
     border-radius: 18px;
-    font-size: 16px;
+    font-size: var(--fs-md);
     line-height: 1.7;
     word-break: break-word;
 }
@@ -867,7 +891,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     border-bottom-left-radius: 4px;
     box-shadow: 0 2px 10px rgba(30, 40, 35, 0.04);
     /* ===== 助手回复：基础字号 + 行高 ===== */
-    font-size: 16px;
+    font-size: var(--fs-md);
     line-height: 1.8;
 }
 .chef-msg-assistant .chef-msg-content > *:first-child { margin-top: 0.1em; }
@@ -875,7 +899,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 
 /* ===== 引导段落 & 常规段落 ===== */
 .chef-msg-assistant .chef-msg-content p {
-    font-size: 16px;
+    font-size: var(--fs-md);
     line-height: 1.8;
     margin: 0 0 0.8em 0;
 }
@@ -890,7 +914,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     color: var(--text);
 }
 .chef-msg-assistant .chef-msg-content h2 {
-    font-size: 20px;
+    font-size: var(--fs-xl);
     margin: 1.5em 0 0.7em 0;
     padding: 6px 0 6px 16px;
     position: relative;
@@ -905,7 +929,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     background: var(--primary);
 }
 .chef-msg-assistant .chef-msg-content h3 {
-    font-size: 18px;
+    font-size: var(--fs-lg);
     margin: 1em 0 0.5em 0;
 }
 
@@ -938,7 +962,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     padding-left: 1.8em;
 }
 .chef-msg-assistant .chef-msg-content li {
-    font-size: 16px;
+    font-size: var(--fs-md);
     line-height: 1.8;
     padding: 3px 0;
 }
@@ -955,7 +979,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 .chef-msg-assistant .chef-msg-content > h2:nth-of-type(1) + * + ol > li > strong:first-child,
 .chef-msg-assistant .chef-msg-content > ol:first-of-type > li > strong:first-child {
     color: var(--primary);
-    font-size: 17px;
+    font-size: var(--fs-md);
 }
 /* 子项（蔬菜分类下的具体食材 list）—— marker 主色小点 */
 .chef-msg-assistant .chef-msg-content > h2:nth-of-type(1) + ol > li > ul > li::marker,
@@ -1009,7 +1033,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     width: 28px; height: 28px;
     line-height: 28px;
     text-align: center;
-    font-size: 14px;
+    font-size: var(--fs-base);
     font-weight: 700;
     color: #fff;
     background: linear-gradient(135deg, var(--primary), #5a7a5e);
@@ -1054,13 +1078,13 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 .chef-msg-assistant .chef-msg-content > h2:nth-of-type(2) + * + ol > li > p:first-child,
 .chef-msg-assistant .chef-msg-content > ol:nth-of-type(2) > li > p:first-child {
     margin: 0 0 0.6em 0;
-    font-size: 18px;
+    font-size: var(--fs-lg);
     line-height: 1.6;
 }
 .chef-msg-assistant .chef-msg-content > h2:nth-of-type(2) + ol > li > p:first-child > strong:first-child,
 .chef-msg-assistant .chef-msg-content > h2:nth-of-type(2) + * + ol > li > p:first-child > strong:first-child,
 .chef-msg-assistant .chef-msg-content > ol:nth-of-type(2) > li > p:first-child > strong:first-child {
-    font-size: 20px;
+    font-size: var(--fs-xl);
     color: var(--text);
 }
 /* 如果菜名直接是 li 的第一个子元素 strong（没有 p 包裹） */
@@ -1069,7 +1093,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 .chef-msg-assistant .chef-msg-content > ol:nth-of-type(2) > li > strong:first-child {
     display: inline-block;
     margin: 0 0 0.6em 0;
-    font-size: 20px;
+    font-size: var(--fs-xl);
     color: var(--text);
 }
 
@@ -1088,7 +1112,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 .chef-msg-assistant .chef-msg-content > ol:nth-of-type(2) > li > ul > li {
     position: relative;
     padding: 5px 0 5px 18px;
-    font-size: 17px;
+    font-size: var(--fs-md);
     line-height: 1.8;
 }
 .chef-msg-assistant .chef-msg-content > h2:nth-of-type(2) + ol > li > ul > li::before,
@@ -1128,7 +1152,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 .chef-msg-assistant .chef-msg-content > h2:nth-of-type(2) + * + ol > li > ul > li > ol > li,
 .chef-msg-assistant .chef-msg-content > ol:nth-of-type(2) > li > ul > li > ol > li {
     padding: 2px 0 2px 6px;
-    font-size: 15px;
+    font-size: var(--fs-base);
 }
 
 /* ===== 新鲜度点评（在可用食材清单末尾，是 ul 下的"- 新鲜度点评：…"） ===== */
@@ -1136,7 +1160,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     margin-top: 0.6em;
 }
 .chef-msg-assistant .chef-msg-content > ul > li {
-    font-size: 16px;
+    font-size: var(--fs-md);
 }
 .chef-msg-assistant .chef-msg-content > ul > li::marker {
     color: var(--primary);
@@ -1156,7 +1180,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 
 /* ===== 兜底：React .prose 类后代强制对齐 ===== */
 .chef-chat-container :where(.prose, .prose-sage) {
-    font-size: 16px !important;
+    font-size: var(--fs-md) !important;
     line-height: 1.8 !important;
     max-width: 100% !important;
     color: var(--text) !important;
@@ -1181,7 +1205,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     max-width: 520px;
 }
 .chef-processing-title {
-    font-size: 15px;
+    font-size: var(--fs-base);
     font-weight: 700;
     color: var(--text);
     margin-bottom: 14px;
@@ -1191,7 +1215,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 13px;
+    font-size: var(--fs-sm);
     color: var(--text-muted);
     line-height: 1.6;
     padding: 3px 0;
@@ -1237,7 +1261,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 }
 .chef-processing-sub {
     margin-top: 10px;
-    font-size: 12px;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     opacity: 0.85;
 }
@@ -1251,7 +1275,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     border-radius: 12px;
     background: linear-gradient(135deg, rgba(123,188,142,0.10), rgba(173,196,222,0.14));
     color: var(--primary-dark, #4a634f);
-    font-size: 13px;
+    font-size: var(--fs-sm);
     font-weight: 600;
 }
 .chef-streaming-dots {
@@ -1282,7 +1306,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     left: 41px !important; top: 14px !important;
     width: 36px !important; height: 36px !important;
     line-height: 36px !important;
-    font-size: 26px !important;
+    font-size: var(--fs-3xl) !important;
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
@@ -1295,7 +1319,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 /* ====== 思考过程样式（流式输出时灰色展示） ====== */
 .chef-msg-content.chef-thinking {
     color: var(--text-muted) !important;
-    font-size: 15px !important;
+    font-size: var(--fs-base) !important;
     line-height: 1.7 !important;
     opacity: 0.75;
     white-space: pre-wrap;
@@ -1306,7 +1330,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 .chef-msg-content.chef-thinking::before {
     content: '思考中...';
     display: block;
-    font-size: 13px;
+    font-size: var(--fs-sm);
     color: var(--text-muted);
     margin-bottom: 6px;
     font-style: italic;
@@ -1315,7 +1339,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
 .chef-msg-content.chef-thinking li,
 .chef-msg-content.chef-thinking div {
     color: var(--text-muted) !important;
-    font-size: 15px !important;
+    font-size: var(--fs-base) !important;
 }
 
 /* ====== 菜卡文本下方大图（全宽展示，不再左右浮动） ====== */
@@ -1347,7 +1371,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     min-height: 120px;
 }
 .chef-msg-assistant .chef-msg-content .dish-hero-image-wrap.dish-hero-failed .dish-hero-fallback-text {
-    font-size: 16px;
+    font-size: var(--fs-md);
     font-weight: 700;
     color: var(--primary-dark, #4a634f);
     line-height: 1.4;
@@ -1362,7 +1386,7 @@ button:not([disabled]).bg-gradient-to-r.from-orange-500.to-red-500:hover {
     width: 26px;
     height: 26px;
     margin: 10px auto 4px auto;
-    font-size: 18px;
+    font-size: var(--fs-lg);
     border-radius: 50%;
     background: rgba(255,255,255,0.7);
     border: 1px solid rgba(123,188,142,0.25);

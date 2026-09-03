@@ -3,10 +3,13 @@ import re
 import smtplib
 import imaplib
 import email as email_lib
+import sqlite3
 from email.header import decode_header
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr, formatdate, make_msgid
+from pathlib import Path
+from typing import Callable, Optional
 
 from langchain.agents import AgentState, create_agent
 from langchain.tools import tool, ToolRuntime
@@ -23,6 +26,128 @@ import aiosqlite
 import os
 
 AUTHENTICATED_KEY = "authenticated"
+
+
+# ============================================================
+# 全局凭据表（解决「两条路径 user_id 不一致 → 新会话又让用户填邮箱」的终极兜底）
+# ------------------------------------------------------------
+# 任何一次 authenticate 工具成功 / /email/auth 表单认证成功,
+# 都把 (邮箱,授权码,服务器配置) 写入独立的 SQLite 表 email_global_credentials。
+# 之后任何新建 thread, prompt 中间件都先查表 — 只要有有效凭据,
+# 立刻强制 state.authenticated=True,不再依赖 agent state 复制时序 / aupdate_state 成功与否。
+# ============================================================
+_GLOBAL_CRED_DB = Path(__file__).resolve().parent.parent.parent / "db" / "email_global_credentials.db"
+
+
+def _ensure_global_cred_table():
+    try:
+        _GLOBAL_CRED_DB.parent.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(str(_GLOBAL_CRED_DB), timeout=5) as conn:
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS email_global_credentials (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    email TEXT NOT NULL UNIQUE,
+                    auth_code TEXT NOT NULL,
+                    smtp_host TEXT,
+                    smtp_port INTEGER,
+                    imap_host TEXT,
+                    imap_port INTEGER,
+                    from_name TEXT DEFAULT '',
+                    created_at TEXT DEFAULT (datetime('now','localtime')),
+                    updated_at TEXT DEFAULT (datetime('now','localtime'))
+                )
+                """
+            )
+            conn.commit()
+    except Exception as e:
+        logger.warning(f"[_ensure_global_cred_table] 建表失败: {e}")
+
+
+def save_global_credentials(
+    email: str,
+    auth_code: str,
+    smtp_host: Optional[str] = None,
+    smtp_port: Optional[int] = None,
+    imap_host: Optional[str] = None,
+    imap_port: Optional[int] = None,
+    from_name: str = "",
+):
+    """任何地方认证成功都调用我,把凭据永久保存到全局表。"""
+    try:
+        _ensure_global_cred_table()
+        email_n = (email or "").strip().lower()
+        if not email_n or not auth_code:
+            return False
+        with sqlite3.connect(str(_GLOBAL_CRED_DB), timeout=5) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT id FROM email_global_credentials WHERE email = ?", (email_n,))
+            row = cur.fetchone()
+            if row:
+                cur.execute(
+                    """
+                    UPDATE email_global_credentials
+                       SET auth_code = ?, smtp_host = ?, smtp_port = ?,
+                           imap_host = ?, imap_port = ?, from_name = ?,
+                           updated_at = datetime('now','localtime')
+                     WHERE email = ?
+                    """,
+                    (auth_code, smtp_host, smtp_port, imap_host, imap_port, from_name, email_n),
+                )
+            else:
+                cur.execute(
+                    """
+                    INSERT INTO email_global_credentials
+                    (email, auth_code, smtp_host, smtp_port, imap_host, imap_port, from_name)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (email_n, auth_code, smtp_host, smtp_port, imap_host, imap_port, from_name),
+                )
+            conn.commit()
+            logger.info(f"[global-cred] 已保存/更新邮箱 {email_n} 的全局凭据")
+            return True
+    except Exception as e:
+        logger.warning(f"[global-cred] save_global_credentials 失败: {e}")
+        return False
+
+
+def load_global_credentials(email: Optional[str] = None) -> Optional[dict]:
+    """加载全局凭据:
+    - email 给定 → 返回该邮箱的凭据
+    - email 为 None → 返回最近一次更新的凭据
+    """
+    try:
+        _ensure_global_cred_table()
+        if not _GLOBAL_CRED_DB.exists():
+            return None
+        with sqlite3.connect(str(_GLOBAL_CRED_DB), timeout=5) as conn:
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            if email and (email or "").strip():
+                cur.execute(
+                    "SELECT * FROM email_global_credentials WHERE email = ?",
+                    ((email or "").strip().lower(),),
+                )
+            else:
+                cur.execute(
+                    "SELECT * FROM email_global_credentials ORDER BY updated_at DESC LIMIT 1"
+                )
+            row = cur.fetchone()
+            if not row:
+                return None
+            return {
+                "authenticated": True,
+                "email": row["email"],
+                "auth_code": row["auth_code"],
+                "smtp_host": row["smtp_host"],
+                "smtp_port": row["smtp_port"],
+                "imap_host": row["imap_host"],
+                "imap_port": row["imap_port"],
+                "from_name": row["from_name"] or "",
+            }
+    except Exception as e:
+        logger.warning(f"[global-cred] load_global_credentials 失败: {e}")
+        return None
 
 EMAIL_PROVIDERS = {
     "163.com":     {"smtp": ("smtp.163.com", 465), "imap": ("imap.163.com", 993), "name": "网易163邮箱"},
@@ -325,6 +450,16 @@ def authenticate(email: str, password: str, runtime: ToolRuntime) -> Command:
         update["imap_host"] = imap_host
         update["imap_port"] = imap_port
         update["from_name"] = ""
+        # ✅ 新增：认证成功立即写入全局凭据表，未来任何新会话都能直接读到
+        save_global_credentials(
+            email=email,
+            auth_code=password,
+            smtp_host=smtp_host,
+            smtp_port=smtp_port,
+            imap_host=imap_host,
+            imap_port=imap_port,
+            from_name="",
+        )
     return Command(update=update)
 
 
@@ -354,6 +489,17 @@ def check_inbox(runtime: ToolRuntime) -> str:
     imap_host = state.get("imap_host")
     imap_port = state.get("imap_port")
     authenticated = state.get(AUTHENTICATED_KEY)
+
+    # ✅ 兜底：runtime.state 还没有凭据时，去全局凭据表取最近一次
+    if not (email_addr and auth_code and imap_host):
+        cred = load_global_credentials(email=email_addr) or load_global_credentials(email=None)
+        if cred and cred.get("authenticated"):
+            email_addr = cred.get("email")
+            auth_code = cred.get("auth_code")
+            imap_host = cred.get("imap_host")
+            imap_port = cred.get("imap_port")
+            authenticated = True
+            logger.info(f"[global-cred] check_inbox 从全局凭据表恢复: email={email_addr!r}")
 
     logger.info(f"[check_inbox] authenticated={authenticated!r}, email={email_addr!r}, imap_host={imap_host!r}")
 
@@ -406,6 +552,19 @@ def send_email(to: str, subject: str, body: str, runtime: ToolRuntime) -> str:
     from_name = state.get("from_name", "")
     authenticated = state.get(AUTHENTICATED_KEY)
 
+    # ✅ 兜底：runtime.state 还没有凭据时，去全局凭据表取最近一次
+    if not (email_addr and auth_code and smtp_host):
+        cred = load_global_credentials(email=email_addr) or load_global_credentials(email=None)
+        if cred and cred.get("authenticated"):
+            email_addr = cred.get("email")
+            auth_code = cred.get("auth_code")
+            smtp_host = cred.get("smtp_host")
+            smtp_port = cred.get("smtp_port")
+            authenticated = True
+            if not from_name:
+                from_name = cred.get("from_name", "")
+            logger.info(f"[global-cred] send_email 从全局凭据表恢复: email={email_addr!r}")
+
     logger.info(f"[send_email] authenticated={authenticated!r}, from_email={email_addr!r}, smtp_host={smtp_host!r}, to={to!r}")
 
     if not email_addr or not auth_code or not smtp_host:
@@ -429,6 +588,21 @@ async def dynamic_tool_call(
     request: ModelRequest, handler: Callable[[ModelRequest], ModelResponse]
 ) -> ModelResponse:
     authenticated = request.state.get(AUTHENTICATED_KEY)
+
+    # ✅ 兜底：thread state 说未认证，但全局凭据表里有保存过的凭据 → 直接视为已认证
+    #    （解决新会话 agent state 还没同步/复制凭据时，又让用户填的问题）
+    global_cred = None
+    if not authenticated:
+        state_email = (request.state.get("email") or "").strip() or None
+        global_cred = load_global_credentials(email=state_email)
+        if global_cred is None:
+            global_cred = load_global_credentials(email=None)  # 取最近一次
+        if global_cred and global_cred.get("authenticated"):
+            authenticated = True
+            logger.info(
+                f"[global-cred] dynamic_tool_call 从全局凭据表恢复认证: "
+                f"email={global_cred.get('email')!r}"
+            )
 
     if authenticated:
         tools = [check_inbox, send_email, set_sender_name]
@@ -471,6 +645,18 @@ unauthenticated_prompt = """你是一个真实可用的邮箱助手，可以连�
 @dynamic_prompt
 def dynamic_prompt_func(request: ModelRequest) -> str:
     authenticated = request.state.get(AUTHENTICATED_KEY)
+
+    # ✅ 兜底:thread state 说未认证,但全局凭据表里有 → 照样按已认证prompt走
+    if not authenticated:
+        state_email = (request.state.get("email") or "").strip() or None
+        global_cred = load_global_credentials(email=state_email) or load_global_credentials(email=None)
+        if global_cred and global_cred.get("authenticated"):
+            authenticated = True
+            logger.info(
+                f"[global-cred] dynamic_prompt_func 从全局凭据表恢复认证: "
+                f"email={global_cred.get('email')!r}"
+            )
+
     final_prompt = authenticated_prompt if authenticated else unauthenticated_prompt
     return final_prompt
 
